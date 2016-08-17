@@ -29,9 +29,7 @@ VALIDATE_CONFIG = {
     'THREAD_NUM': 1000,
     'TIMEOUT': 20,
     'PROXY_TYPE': [0, 1, 2, 3],
-    'TARGET': 'http://proxy.mimvp.com/check.php',
-    # 'TARGET1': 'http://7xr8ng.com1.z0.glb.clouddn.com/a.txt',
-    # 'TARGET2': 'http://www.stilllistener.com/checkpoint1/test11/'
+    'TARGET': 'http://www.stilllistener.com/checkpoint1/test11/'
 }
 
 DB_CONFIG = {

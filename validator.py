@@ -17,7 +17,7 @@ class Validator:
         self.timeout = VALIDATE_CONFIG['TIMEOUT']
         self.thread_num = VALIDATE_CONFIG['THREAD_NUM']
         self.pattern = re.compile(
-            r'((?:IP:Port)|(?:HTTP_CLIENT_IP)|(?:HTTP_X_FORWARDED_FOR))</td>\n?\s*<td.*?>(.*?)</td>', re.I)
+            r'((?:REMOTE_HOST)|(?:HTTP_CLIENT_IP)|(?:HTTP_X_FORWARDED_FOR))</td>\n?\s*<td.*?>(.*?)</td>', re.I)
         self.ip = self._get_self_ip()
         self.IPL = pyip.IPLocator('QQWry.Dat')
 
@@ -41,7 +41,7 @@ class Validator:
                 headers_info = {}
                 for header in headers:
                     headers_info[header[0]] = header[1].split(':')[0]
-                REMOTE_ADDR = headers_info.get('IP:Port', '')
+                REMOTE_ADDR = headers_info.get('REMOTE_HOST', '')
                 HTTP_VIA = headers_info.get('HTTP_CLIENT_IP', '')
                 HTTP_X_FORWARDED_FOR = headers_info.get('HTTP_X_FORWARDED_FOR', '')
                 if REMOTE_ADDR and REMOTE_ADDR != self.ip:
@@ -68,10 +68,9 @@ class Validator:
     def _get_self_ip(self):
         # 获取自身外网ip
         try:
-            r = requests.get(self.target, timeout=5)
+            r = requests.get(self.target)
             if r.ok:
-                pattern = re.compile(r'IP:port</td>\n?\s*<td.*?>([\d.]*?)(?::\d*)</td>', re.I)
-                ip = pattern.search(r.content).group(1)
+                ip = re.search(r'REMOTE_HOST</td>\n?\s*<td.*?>([\d\.]*?)</td>', r.content, re.I).group(1)
                 logger.info('Get self ip success: %s' % ip)
                 return ip
         except Exception, e:
