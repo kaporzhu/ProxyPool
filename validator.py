@@ -4,6 +4,7 @@ from gevent import monkey
 monkey.patch_all()
 from gevent.pool import Pool
 from logger import logger
+import json
 import re
 import time
 import pyip
@@ -37,13 +38,17 @@ class Validator:
             r = requests.get(self.target, proxies={'http': 'http://%s' % proxy}, timeout=self.timeout)
             if r.ok:
                 speed = time.time() - start
-                headers = self.pattern.findall(r.content)
-                headers_info = {}
-                for header in headers:
-                    headers_info[header[0]] = header[1].split(':')[0]
-                REMOTE_ADDR = headers_info.get('REMOTE_HOST', '')
-                HTTP_VIA = headers_info.get('HTTP_CLIENT_IP', '')
-                HTTP_X_FORWARDED_FOR = headers_info.get('HTTP_X_FORWARDED_FOR', '')
+                # headers = self.pattern.findall(r.content)
+                # headers_info = {}
+                # for header in headers:
+                #     headers_info[header[0]] = header[1].split(':')[0]
+                # REMOTE_ADDR = headers_info.get('REMOTE_HOST', '')
+                # HTTP_VIA = headers_info.get('HTTP_CLIENT_IP', '')
+                # HTTP_X_FORWARDED_FOR = headers_info.get('HTTP_X_FORWARDED_FOR', '')
+                resp = json.loads(r.content)
+                REMOTE_ADDR = resp.get('remote_addr')
+                HTTP_VIA = resp.get('http_via')
+                HTTP_X_FORWARDED_FOR = resp.get('http_x_forwarded_for')
                 if REMOTE_ADDR and REMOTE_ADDR != self.ip:
                     if not HTTP_X_FORWARDED_FOR:
                         if not HTTP_VIA:
@@ -66,11 +71,12 @@ class Validator:
         return None
 
     def _get_self_ip(self):
+
         # 获取自身外网ip
         try:
             r = requests.get(self.target)
             if r.ok:
-                ip = re.search(r'REMOTE_HOST</td>\n?\s*<td.*?>([\d\.]*?)</td>', r.content, re.I).group(1)
+                ip = json.loads(r.content)['remote_addr']
                 logger.info('Get self ip success: %s' % ip)
                 return ip
         except Exception, e:

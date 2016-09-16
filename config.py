@@ -29,7 +29,8 @@ VALIDATE_CONFIG = {
     'THREAD_NUM': 1000,
     'TIMEOUT': 20,
     'PROXY_TYPE': [0, 1, 2, 3],
-    'TARGET': 'http://www.stilllistener.com/checkpoint1/test11/'
+    #'TARGET': 'http://www.stilllistener.com/checkpoint1/test11/'
+    'TARGET': 'http://115.29.233.17:8001'
 }
 
 DB_CONFIG = {
